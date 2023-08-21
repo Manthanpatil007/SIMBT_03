@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz App</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #53a3ad;
+      }
+      
+      .container {
+        background-color: #ffffff;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        width: 100%;
+      }
+      
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      
+      #quiz-container {
+        margin-bottom: 20px;
+      }
+      
+      #question-container {
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+      
+      #answers-container {
+        display: flex;
+        flex-direction: column;
+      }
+      
+      #answers-container label {
+        margin-bottom: 5px;
+      }
+      
+      #feedback {
+        text-align: center;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+      
+      #score-container,
+      #timer-container {
+        font-weight: bold;
+        text-align: center;
+      }
+      
+      #submit-button {
+        background-color: #007bff;
+        color: #ffffff;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        cursor: pointer;
+        margin-top: 10px;
+        width: 100%;
+      }
+      
+      #submit-button:hover {
+        background-color: #0056b3;
+      }
+      
+      #submit-button:disabled {
+        background-color: #e0e0e0;
+        cursor: not-allowed;
+      }
+  </style>
+</head>
+
+
+<body>
+  <div class="container">
+    <h1>Quiz App</h1>
+    <div id="quiz-container">
+      <div id="question-container"></div>
+      <div id="answers-container"></div>
+    </div>
+    <button id="submit-button" onclick="submitAnswer()">Submit</button>
+    <div id="feedback"></div>
+    <div id="score-container">Score: <span id="score">0</span></div>
+    <div id="timer-container">Time Left: <span id="timer">0</span></div>
+  </div>
+
+  <script>
+    // Sample question bank
+const questions = [
+{
+  question: "What is the capital of France?",
+  answers: ["London", "Paris", "Berlin", "Rome"],
+  correct: 1,
+},
+{
+  question: "Who wrote the play 'Romeo and Juliet'?",
+  answers: ["William Shakespeare", "Jane Austen", "Charles Dickens", "Leo Tolstoy"],
+  correct: 0,
+},
+// Add more questions here
+];
+
+let currentQuestionIndex = 0;
+let score = 0;
+const quizContainer = document.getElementById("quiz-container");
+const questionContainer = document.getElementById("question-container");
+const answersContainer = document.getElementById("answers-container");
+const feedbackContainer = document.getElementById("feedback");
+const scoreContainer = document.getElementById("score");
+const timerContainer = document.getElementById("timer");
+const submitButton = document.getElementById("submit-button");
+
+function displayQuestion() {
+const currentQuestion = questions[currentQuestionIndex];
+questionContainer.textContent = currentQuestion.question;
+answersContainer.innerHTML = "";
+
+currentQuestion.answers.forEach((answer, index) => {
+  const input = document.createElement("input");
+  input.type = "radio";
+  input.name = "answer";
+  input.value = index;
+  answersContainer.appendChild(input);
+
+  const label = document.createElement("label");
+  label.textContent = answer;
+  answersContainer.appendChild(label);
+});
+}
+
+function submitAnswer() {
+const selectedAnswer = parseInt(document.querySelector("input[name='answer']:checked").value);
+
+if (selectedAnswer === questions[currentQuestionIndex].correct) {
+  score++;
+  feedbackContainer.textContent = "Correct!";
+} else {
+  feedbackContainer.textContent = "Incorrect!";
+}
+
+currentQuestionIndex++;
+if (currentQuestionIndex < questions.length) {
+  displayQuestion();
+} else {
+  endQuiz();
+}
+}
+
+function endQuiz() {
+quizContainer.innerHTML = `<h2>Quiz Completed!</h2><p>Your Score: ${score} out of ${questions.length}</p>`;
+timerContainer.style.display = "none";
+submitButton.disabled = true;
+submitButton.textContent = "Quiz Completed";
+}
+
+function startTimer(timeLimit) {
+let timeLeft = timeLimit;
+const timerInterval = setInterval(() => {
+  timerContainer.textContent = timeLeft;
+  timeLeft--;
+
+  if (timeLeft < 0) {
+    clearInterval(timerInterval);
+    feedbackContainer.textContent = "Time's up!";
+    submitButton.disabled = true;
+    submitButton.textContent = "Next";
+    currentQuestionIndex++;
+    if (currentQuestionIndex < questions.length) {
+      displayQuestion();
+    } else {
+      endQuiz();
+    }
+  }
+}, 1000);
+}
+
+// Start the quiz when the page loads
+displayQuestion();
+startTimer(15); // Set the time limit for each question (in seconds)
+  </script>
+</body>
+
+</html>
